@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jhzz.myblog.mapper.ArticleMapper">
+
+    <resultMap id="BaseResultMap" type="com.jhzz.myblog.domain.Article">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="commentCounts" column="comment_counts" jdbcType="INTEGER"/>
+            <result property="gmtCreate" column="gmt_create" jdbcType="TIMESTAMP"/>
+            <result property="summary" column="summary" jdbcType="VARCHAR"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
+            <result property="viewCounts" column="view_counts" jdbcType="INTEGER"/>
+            <result property="weight" column="weight" jdbcType="INTEGER"/>
+            <result property="authorId" column="author_id" jdbcType="BIGINT"/>
+            <result property="bodyId" column="body_id" jdbcType="BIGINT"/>
+            <result property="categoryId" column="category_id" jdbcType="INTEGER"/>
+            <result property="gmtModified" column="gmt_modified" jdbcType="TIMESTAMP"/>
+            <result property="cover" column="cover" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,comment_counts,gmt_create,
+        summary,title,view_counts,
+        weight,author_id,body_id,
+        category_id,gmt_modified,cover
+    </sql>
+</mapper>

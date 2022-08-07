@@ -5,6 +5,7 @@ import com.jhzz.myblog.domain.SysUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jhzz.myblog.domain.param.LoginParam;
 import com.jhzz.myblog.domain.param.RegisterParam;
+import com.jhzz.myblog.domain.param.VerifyParam;
 
 /**
 * @author Huanzhi
@@ -13,9 +14,10 @@ import com.jhzz.myblog.domain.param.RegisterParam;
 */
 public interface SysUserService extends IService<SysUser> {
 
-    SysUser getAuthorInfoById(String authorId);
+    SysUser getAuthorInfoByAccount(String authorId);
 
     ResponseResult register(RegisterParam register);
 
 
+    ResponseResult verification(VerifyParam data);
 }

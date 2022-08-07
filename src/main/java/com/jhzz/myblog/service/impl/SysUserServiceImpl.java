@@ -2,6 +2,7 @@ package com.jhzz.myblog.service.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.log.Log;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhzz.myblog.common.AppHttpCodeEnum;
@@ -10,10 +11,12 @@ import com.jhzz.myblog.common.ResponseResult;
 import com.jhzz.myblog.domain.SysUser;
 import com.jhzz.myblog.domain.param.LoginParam;
 import com.jhzz.myblog.domain.param.RegisterParam;
+import com.jhzz.myblog.domain.param.VerifyParam;
 import com.jhzz.myblog.exception.BlogException;
 import com.jhzz.myblog.service.SysUserService;
 import com.jhzz.myblog.mapper.SysUserMapper;
 import com.jhzz.myblog.util.RedisCache;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.util.Base64Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +31,14 @@ import java.util.List;
  * @createDate 2022-07-31 18:31:49
  */
 @Service
+@Slf4j
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         implements SysUserService {
     @Autowired
     private RedisCache redisCache;
 
     @Override
-    public SysUser getAuthorInfoById(String account) {
+    public SysUser getAuthorInfoByAccount(String account) {
         SysUser user = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getAccount, account));
         return user;
     }
@@ -85,7 +89,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         //加密密码
 
         if (StrUtil.isNotBlank(register.getPassword())) {
-            user.setPassword(DigestUtils.md5Hex(register.getPassword()+Constant.SLAT));
+            user.setPassword(DigestUtils.md5Hex(register.getPassword() + Constant.SLAT));
         }
         user.setSalt("");
         user.setStatus("1");
@@ -94,6 +98,26 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         return ResponseResult.okResult("注册成功！");
     }
 
+    @Override
+    public ResponseResult verification(VerifyParam data) {
+        String type = data.getType();
+        String account = data.getAccount();
+        log.info("account:{}",account);
+        log.info("type:{}",type);
+        if (!StrUtil.isAllNotBlank(type, account)) {
+            return ResponseResult.errorResult(500, "用户名为空!");
+        }
+        SysUser user = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getAccount, account));
+        log.info("user:{}",user);
+        if (user == null){
+            return ResponseResult.errorResult(500, "用户名不存在！");
+        }
+        String email = user.getEmail();
+        HashMap<String, Object> map = new HashMap<>(2);
+        map.put("email",email);
+        map.put("status","ok");
+        return ResponseResult.okResult(map);
+    }
 
 
 }

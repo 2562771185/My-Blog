@@ -8,6 +8,7 @@ import com.jhzz.myblog.common.Constant;
 import com.jhzz.myblog.common.ResponseResult;
 import com.jhzz.myblog.domain.SysUser;
 import com.jhzz.myblog.domain.param.LoginParam;
+import com.jhzz.myblog.domain.param.VerifyParam;
 import com.jhzz.myblog.exception.BlogException;
 import com.jhzz.myblog.mapper.SysUserMapper;
 import com.jhzz.myblog.service.LoginService;
@@ -150,8 +151,8 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public ResponseResult delToken(String token) {
-        log.info("delToken:{}",token);
-        if (StrUtil.isBlank(token)){
+        log.info("delToken:{}", token);
+        if (StrUtil.isBlank(token)) {
             return ResponseResult.errorResult(500, "token为空");
         }
         try {
@@ -162,11 +163,12 @@ public class LoginServiceImpl implements LoginService {
                 throw new BlogException(AppHttpCodeEnum.NO_OPERATOR_AUTH.getCode(), AppHttpCodeEnum.NO_OPERATOR_AUTH.getMsg());
             }
             //解析成功,查询redis中是否有数据
-            redisCache.deleteObject(Constant.LOGIN_USER+userAccount);
+            redisCache.deleteObject(Constant.LOGIN_USER + userAccount);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return ResponseResult.okResult();
     }
+
 }

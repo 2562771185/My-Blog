@@ -3,6 +3,7 @@ package com.jhzz.myblog.service;
 import com.jhzz.myblog.common.ResponseResult;
 import com.jhzz.myblog.domain.SysUser;
 import com.jhzz.myblog.domain.param.LoginParam;
+import com.jhzz.myblog.domain.param.VerifyParam;
 
 /**
  * \* Created with IntelliJ IDEA.
@@ -22,4 +23,5 @@ public interface LoginService {
     ResponseResult refreshToken(String token);
 
     ResponseResult delToken(String token);
+
 }

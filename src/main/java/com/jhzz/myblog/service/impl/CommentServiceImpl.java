@@ -2,6 +2,8 @@ package com.jhzz.myblog.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -56,6 +58,12 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
 
     @Override
     public ResponseResult comment(CommentParam commentParam) {
+        if(StrUtil.isBlank(commentParam.getContent())){
+            return ResponseResult.errorResult(500,"评论内容不能为空！");
+        }
+        if (ObjectUtil.isAllNotEmpty(commentParam.getCommentId(),commentParam.getAuthorId())){
+            return ResponseResult.errorResult(500,"评论者或者评论文章不能为空！");
+        }
         Comment comment = new Comment();
         comment.setContent(commentParam.getContent());
         comment.setCreateDate(DateTime.now().getTime());

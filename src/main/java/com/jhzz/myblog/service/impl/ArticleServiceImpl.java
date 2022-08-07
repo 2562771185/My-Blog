@@ -1,6 +1,7 @@
 package com.jhzz.myblog.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,6 +12,7 @@ import com.jhzz.myblog.common.ResponseResult;
 import com.jhzz.myblog.domain.Article;
 import com.jhzz.myblog.domain.ArticleBody;
 import com.jhzz.myblog.domain.SysUser;
+import com.jhzz.myblog.domain.param.CommentParam;
 import com.jhzz.myblog.domain.param.QueryParam;
 import com.jhzz.myblog.domain.vo.ArticleEditVo;
 import com.jhzz.myblog.domain.vo.ArticlePublishVo;
@@ -93,8 +95,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     public ResponseResult editArticle(Long id) {
         //1.查询文章主体
         ArticleBody body = articleBodyService.getOne(new LambdaQueryWrapper<ArticleBody>().eq(ArticleBody::getArticleId, id));
+
         //2.查询文章作者信息
         Article article = this.getById(id);
+        if (ObjectUtil.isAllEmpty(body,article)){
+            return ResponseResult.errorResult(500,"文章不存在");
+        }
         SysUser author = userService.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getId, article.getAuthorId()));
         ArticleEditVo vo = new ArticleEditVo();
         vo.setArticleBody(body);
@@ -103,6 +109,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
         vo.setAuthorAvatar(author.getAvatar());
         vo.setNickname(author.getNickname());
         vo.setAccount(author.getAccount());
+        vo.setSummary(article.getSummary());
         return ResponseResult.okResult(vo);
     }
 
@@ -176,6 +183,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
         this.updateById(articleDone);
         return ResponseResult.okResult(article.getId());
     }
+
 
 }
 

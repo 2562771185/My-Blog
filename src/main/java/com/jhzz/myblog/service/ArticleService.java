@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jhzz.myblog.common.ResponseResult;
 import com.jhzz.myblog.domain.Article;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jhzz.myblog.domain.param.CommentParam;
 import com.jhzz.myblog.domain.param.QueryParam;
 import com.jhzz.myblog.domain.vo.ArticlePublishVo;
 import com.jhzz.myblog.domain.vo.ArticleUpdateVo;
@@ -27,4 +28,5 @@ public interface ArticleService extends IService<Article> {
     ResponseResult delArticle(Long id);
 
     ResponseResult publish(ArticlePublishVo publishVo);
+
 }

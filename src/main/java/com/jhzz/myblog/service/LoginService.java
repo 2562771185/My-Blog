@@ -18,4 +18,8 @@ public interface LoginService {
     ResponseResult logout();
 
     ResponseResult checkToken(String token);
+
+    ResponseResult refreshToken(String token);
+
+    ResponseResult delToken(String token);
 }

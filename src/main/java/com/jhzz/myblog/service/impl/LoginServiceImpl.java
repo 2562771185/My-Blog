@@ -1,6 +1,7 @@
 package com.jhzz.myblog.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jhzz.myblog.common.AppHttpCodeEnum;
 import com.jhzz.myblog.common.Constant;
@@ -14,6 +15,7 @@ import com.jhzz.myblog.util.JwtUtil;
 import com.jhzz.myblog.util.RedisCache;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.util.validation.metadata.NamedObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
 
 /**
  * \* Created with IntelliJ IDEA.
@@ -61,12 +65,12 @@ public class LoginServiceImpl implements LoginService {
         SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getAccount, loginParam.getAccount()));
         //如果认证没通过，给出对应的提示
         if (Objects.isNull(user)) {
-            throw new BlogException(500,"登录失败");
+            throw new BlogException(500, "登录失败");
         }
         //todo 解密密码验证
         String hex = DigestUtils.md5Hex(loginParam.getPassword() + Constant.SLAT);
-        if (!StrUtil.equals(hex,loginParam.getPassword())){
-            return ResponseResult.errorResult(500,"用户名或密码错误!");
+        if (!StrUtil.equals(hex, user.getPassword())) {
+            return ResponseResult.errorResult(500, "用户名或密码错误!");
         }
         //如果认证通过了，使用userid生成一个jwt jwt存入ResponseResult返回
         String account = user.getAccount();
@@ -75,7 +79,7 @@ public class LoginServiceImpl implements LoginService {
         Map<String, Object> map = new HashMap<>(1);
         map.put("token", jwt);
         //把完整的用户信息存入redis  userid作为key
-        redisCache.setCacheObject(Constant.LOGIN_USER + account, user,2, TimeUnit.HOURS);
+        redisCache.setCacheObject(Constant.LOGIN_USER + account, JSON.toJSONString(user), 2, TimeUnit.HOURS);
         return ResponseResult.okResult(200, "登录成功", map);
     }
 
@@ -88,27 +92,81 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public ResponseResult checkToken(String token) {
-        log.info("token:{}",token);
+        log.info("checkToken:{}", token);
         try {
             Claims claims = JwtUtil.parseJWT(token);
             String userAccount = claims.getSubject();
-            if (StrUtil.isBlank(userAccount)){
+            if (StrUtil.isBlank(userAccount)) {
                 //解析token失败
-                throw new BlogException(AppHttpCodeEnum.NO_OPERATOR_AUTH.getCode(),AppHttpCodeEnum.NO_OPERATOR_AUTH.getMsg());
+                throw new BlogException(AppHttpCodeEnum.NO_OPERATOR_AUTH.getCode(), AppHttpCodeEnum.NO_OPERATOR_AUTH.getMsg());
             }
-            SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getAccount, userAccount));
-            if (user == null){
-                throw new BlogException(AppHttpCodeEnum.NOT_USER.getCode(),AppHttpCodeEnum.NOT_USER.getMsg());
+            //去redis中查询数据
+            String data = redisCache.getCacheObject(Constant.LOGIN_USER + userAccount);
+            SysUser user = JSON.parseObject(data, SysUser.class);
+            log.info("redisCache:user:{}", user);
+            if (user == null) {
+                throw new BlogException(AppHttpCodeEnum.NOT_USER.getCode(), AppHttpCodeEnum.NOT_USER.getMsg());
             }
             HashMap<String, Object> map = new HashMap<>(3);
-            map.put("account",user.getAccount());
-            map.put("nickname",user.getNickname());
-            map.put("avatar",user.getAvatar());
+            map.put("account", user.getAccount());
+            map.put("id", user.getId());
+            map.put("nickname", user.getNickname());
+            map.put("avatar", user.getAvatar());
             return ResponseResult.okResult(map);
         } catch (Exception e) {
             log.error("解析token出错！");
             e.printStackTrace();
         }
-        return ResponseResult.errorResult();
+        return ResponseResult.errorResult(500, "token无效");
+    }
+
+    @Override
+    public ResponseResult refreshToken(String token) {
+        log.info("refreshToken:{}", token);
+        //如果token合法则返回新的token
+        try {
+            Claims claims = JwtUtil.parseJWT(token);
+            String userAccount = claims.getSubject();
+            if (StrUtil.isBlank(userAccount)) {
+                //解析token失败
+                throw new BlogException(AppHttpCodeEnum.NO_OPERATOR_AUTH.getCode(), AppHttpCodeEnum.NO_OPERATOR_AUTH.getMsg());
+            }
+            //解析成功,查询redis中是否有数据
+            String data = redisCache.getCacheObject(Constant.LOGIN_USER + userAccount);
+            SysUser user = JSON.parseObject(data, SysUser.class);
+            if (user == null) {
+                throw new BlogException(AppHttpCodeEnum.NOT_USER.getCode(), AppHttpCodeEnum.NOT_USER.getMsg());
+            }
+            //刷新redis中的数据
+            redisCache.setCacheObject(Constant.CAPTCHA_CODE_KEY + userAccount, user, 2, TimeUnit.HOURS);
+            String jwt = JwtUtil.createJWT(userAccount);
+            return ResponseResult.okResult(jwt);
+        } catch (Exception e) {
+            log.error("解析token出错！");
+            e.printStackTrace();
+        }
+        return ResponseResult.errorResult(500, "token无效");
+    }
+
+    @Override
+    public ResponseResult delToken(String token) {
+        log.info("delToken:{}",token);
+        if (StrUtil.isBlank(token)){
+            return ResponseResult.errorResult(500, "token为空");
+        }
+        try {
+            Claims claims = JwtUtil.parseJWT(token);
+            String userAccount = claims.getSubject();
+            if (StrUtil.isBlank(userAccount)) {
+                //解析token失败
+                throw new BlogException(AppHttpCodeEnum.NO_OPERATOR_AUTH.getCode(), AppHttpCodeEnum.NO_OPERATOR_AUTH.getMsg());
+            }
+            //解析成功,查询redis中是否有数据
+            redisCache.deleteObject(Constant.LOGIN_USER+userAccount);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ResponseResult.okResult();
     }
 }

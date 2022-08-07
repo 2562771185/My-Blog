@@ -1,9 +1,11 @@
 package com.jhzz.myblog.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.jhzz.myblog.common.ResponseResult;
 import com.jhzz.myblog.domain.SysUser;
 import com.jhzz.myblog.domain.param.LoginParam;
 import com.jhzz.myblog.domain.param.RegisterParam;
+import com.jhzz.myblog.domain.vo.UserVo;
 import com.jhzz.myblog.service.LoginService;
 import com.jhzz.myblog.service.SysUserService;
 import io.swagger.annotations.Api;
@@ -29,7 +31,9 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseResult getUserInfo(@RequestParam("account")String account){
         SysUser info = userService.getAuthorInfoById(account);
-        return ResponseResult.okResult(info);
+        UserVo userVo = new UserVo();
+        BeanUtil.copyProperties(info,userVo);
+        return ResponseResult.okResult(userVo);
     }
 
     @PostMapping("/register")
@@ -42,8 +46,17 @@ public class UserController {
         return loginService.login(loginParam);
     }
     @GetMapping("/checkToken")
-    public ResponseResult checkToken(@RequestParam("token") String token){
+    public ResponseResult checkToken(@RequestHeader("Authorization") String token){
         return loginService.checkToken(token);
+    }
+    @GetMapping("/delToken")
+    public ResponseResult delToken(@RequestParam("token") String token){
+        return loginService.delToken(token);
+    }
+
+    @GetMapping("/token")
+    public ResponseResult refreshToken(@RequestHeader("Authorization") String token){
+        return loginService.refreshToken(token);
     }
 
 }

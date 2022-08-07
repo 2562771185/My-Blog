@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jhzz.myblog.common.ResponseResult;
 import com.jhzz.myblog.domain.Comment;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jhzz.myblog.domain.param.CommentParam;
 
 import java.util.List;
 
@@ -15,4 +16,8 @@ import java.util.List;
 public interface CommentService extends IService<Comment> {
 
     ResponseResult getCommentList(Long id, Long page);
+
+    ResponseResult comment(CommentParam commentParam);
+
+    ResponseResult deleteComment(CommentParam commentParam);
 }

@@ -24,4 +24,9 @@ public class ArticleEditVo {
     private String nickname;
     private String account;
 
+    /**
+     * 简介
+     */
+    private String summary;
+
 }

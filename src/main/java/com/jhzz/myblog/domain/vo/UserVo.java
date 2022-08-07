@@ -8,33 +8,49 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * \* Created with IntelliJ IDEA.
  * \* @author: Huanzhi
- * \* Date: 2022/8/1
- * \* Time: 17:19
+ * \* Date: 2022/8/7
+ * \* Time: 14:14
  * \* Description:
  * \
  */
 @Data
-public class CommentVo implements Serializable {
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
-    private String content;
+public class UserVo implements Serializable {
+
+    /**
+     * 账号
+     */
+    private String account;
+
+    /**
+     * 头像
+     */
+    private String avatar;
+
+    /**
+     * 注册时间
+     */
     private Long createDate;
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Integer articleId;
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long authorId;
-    private Long parentId;
-    private String level;
-    private String authorAvatar;
-    private String authorNickname;
-    private List<CommentVo> children;
 
 
+    /**
+     * 邮箱
+     */
+    private String email;
+
+
+    /**
+     * 手机号
+     */
+    private String mobilePhoneNumber;
+
+    /**
+     * 昵称
+     */
+    private String nickname;
 
     private static final long serialVersionUID = 1L;
 

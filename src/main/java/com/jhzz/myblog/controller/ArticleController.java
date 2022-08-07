@@ -3,6 +3,7 @@ package com.jhzz.myblog.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.jhzz.myblog.common.ResponseResult;
 import com.jhzz.myblog.domain.Article;
+import com.jhzz.myblog.domain.param.CommentParam;
 import com.jhzz.myblog.domain.param.QueryParam;
 import com.jhzz.myblog.domain.vo.ArticleEditVo;
 import com.jhzz.myblog.domain.vo.ArticlePublishVo;
@@ -34,26 +35,31 @@ public class ArticleController {
     public ResponseResult queryArticlePage(@RequestBody QueryParam queryParam) {
         return articleService.queryArticlePage(queryParam);
     }
+
     @ApiOperation("根据id获取文章")
     @GetMapping("/get")
-    public ResponseResult getArticleById(@RequestParam("id")Long id) {
+    public ResponseResult getArticleById(@RequestParam("id") Long id) {
         ArticleVo vo = articleService.getArticlesById(id);
         return ResponseResult.okResult(vo);
     }
+
     @ApiOperation("根据id编辑文章")
     @GetMapping("/edit")
-    public ResponseResult editArticle(@RequestParam("id")Long id) {
+    public ResponseResult editArticle(@RequestParam("id") Long id) {
         return articleService.editArticle(id);
     }
+
     @ApiOperation("更新文章")
     @PostMapping("/update")
     public ResponseResult updateArticle(ArticleUpdateVo updateVo) {
         return articleService.updateArticle(updateVo);
     }
+
     @GetMapping("/del")
-    public ResponseResult delArticle(@RequestParam("id")Long id) {
+    public ResponseResult delArticle(@RequestParam("id") Long id) {
         return articleService.delArticle(id);
     }
+
     @PostMapping("/publish")
     public ResponseResult publish(ArticlePublishVo publishVo) {
         return articleService.publish(publishVo);

@@ -21,7 +21,15 @@ public class Constant {
      * 验证码 redis key
      */
     public static final String CAPTCHA_CODE_KEY = "codes:";
+    /**
+     * 登录用户 redis key
+     */
+    public static final String LOGIN_USER = "bloguser:";
 
+    /**
+     * 加密盐
+      */
+    public static final String SLAT = "345323Jzhz!@$*(";
 
 
 }

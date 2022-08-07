@@ -4,6 +4,7 @@ import com.jhzz.myblog.common.AppHttpCodeEnum;
 import com.jhzz.myblog.common.ResponseResult;
 import com.jhzz.myblog.domain.ArticleBody;
 import com.jhzz.myblog.service.ArticleBodyService;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  * \* Description:
  * \
  */
+@Api
 @RestController
 @RequestMapping("body")
 public class ArticleBodyController {

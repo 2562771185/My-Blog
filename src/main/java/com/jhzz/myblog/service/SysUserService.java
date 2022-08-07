@@ -17,6 +17,5 @@ public interface SysUserService extends IService<SysUser> {
 
     ResponseResult register(RegisterParam register);
 
-    ResponseResult login(LoginParam loginParam);
 
 }

@@ -40,6 +40,10 @@ public class ResponseResult<T> implements Serializable {
         ResponseResult result = new ResponseResult();
         return result.error(code, msg);
     }
+    public static ResponseResult errorResult() {
+        ResponseResult result = new ResponseResult();
+        return result.error(500, "操作失败");
+    }
     public static ResponseResult okResult() {
         ResponseResult result = new ResponseResult();
         return result;
@@ -47,6 +51,10 @@ public class ResponseResult<T> implements Serializable {
     public static ResponseResult okResult(int code, String msg) {
         ResponseResult result = new ResponseResult();
         return result.ok(code, null, msg);
+    }
+    public static ResponseResult okResult(int code, String msg,Object data) {
+        ResponseResult result = new ResponseResult();
+        return result.ok(code, data, msg);
     }
 
     public static ResponseResult okResult(Object data) {

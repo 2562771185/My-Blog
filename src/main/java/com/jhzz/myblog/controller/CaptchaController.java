@@ -9,6 +9,7 @@ import com.jhzz.myblog.common.Constant;
 import com.jhzz.myblog.common.ResponseResult;
 import com.jhzz.myblog.util.IdUtils;
 import com.jhzz.myblog.util.RedisCache;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FastByteArrayOutputStream;
@@ -32,12 +33,13 @@ import java.util.concurrent.TimeUnit;
  */
 @RestController
 @Slf4j
+@Api
 public class CaptchaController {
     @Resource(name = "captchaProducer")
     private Producer captchaProducer;
 
 
-    @Autowired
+    @Resource
     private RedisCache redisCache;
 
     /**

@@ -1,10 +1,8 @@
 package com.jhzz.myblog.service.impl;
 
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhzz.myblog.common.AppHttpCodeEnum;
 import com.jhzz.myblog.common.Constant;
@@ -16,10 +14,11 @@ import com.jhzz.myblog.exception.BlogException;
 import com.jhzz.myblog.service.SysUserService;
 import com.jhzz.myblog.mapper.SysUserMapper;
 import com.jhzz.myblog.util.RedisCache;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.logging.log4j.util.Base64Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -50,7 +49,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (StrUtil.isAllNotBlank(uuid, key)) {
             String code = redisCache.getCacheObject(Constant.CAPTCHA_CODE_KEY + uuid);
             //删除掉已经使用的验证码
-            //redisCache.deleteObject(Constant.CAPTCHA_CODE_KEY + uuid);
+            redisCache.deleteObject(Constant.CAPTCHA_CODE_KEY + uuid);
             if (!StrUtil.equalsIgnoreCase(code, key)) {
                 return ResponseResult.errorResult(AppHttpCodeEnum.CODE_ERROR, AppHttpCodeEnum.CODE_ERROR.getMsg());
             }
@@ -83,9 +82,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (StrUtil.isNotBlank(register.getNickname())) {
             user.setNickname(register.getNickname());
         }
-        //todo 加密密码
-        if (StrUtil.isNotBlank(register.getNickname())) {
-            user.setPassword(register.getPassword());
+        //加密密码
+
+        if (StrUtil.isNotBlank(register.getPassword())) {
+            user.setPassword(DigestUtils.md5Hex(register.getPassword()+Constant.SLAT));
         }
         user.setSalt("");
         user.setStatus("1");
@@ -94,28 +94,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         return ResponseResult.okResult("注册成功！");
     }
 
-    @Override
-    public ResponseResult login(LoginParam loginParam) {
-        if (!loginParam.checkAllParams()) {
-            throw new BlogException(AppHttpCodeEnum.PARAM_ERROR.getCode(), AppHttpCodeEnum.PARAM_ERROR.getMsg());
-        }
-        /**
-         * 对比数据库信息
-         */
-        SysUser user = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getAccount, loginParam.getAccount()));
-        if (user != null && StrUtil.equals(loginParam.getPassword(), user.getPassword())) {
-            //todo 返回token
-            String token = "fasfasdfasd23423fasdf";
-            HashMap<String, Object> map = new HashMap<>(1);
-            map.put("token", token);
-            map.put("userAvatar", user.getAvatar());
-            map.put("nickname", user.getNickname());
-            map.put("account", user.getAccount());
-            return ResponseResult.okResult(map);
-        }
-        return ResponseResult.errorResult(AppHttpCodeEnum.LOGIN_ERROR.getCode(), AppHttpCodeEnum.LOGIN_ERROR.getMsg());
 
-    }
+
 }
 
 

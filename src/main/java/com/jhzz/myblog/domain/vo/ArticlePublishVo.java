@@ -16,4 +16,5 @@ public class ArticlePublishVo {
     private String title;
     private String content;
     private String cover;
+    private String summary;
 }

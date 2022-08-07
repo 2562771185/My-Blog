@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ResponseResult error(Exception e){
         e.printStackTrace();
-        return ResponseResult.errorResult(500,"出错了(#^.^#)请联系管理员");
+        return ResponseResult.errorResult(500,"出错了(#^.^#)请联系管理员!");
     }
     @ExceptionHandler(BlogException.class)
     @ResponseBody

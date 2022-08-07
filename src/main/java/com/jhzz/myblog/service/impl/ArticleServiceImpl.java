@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Huanzhi
@@ -62,9 +63,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
         articleVos.forEach(item -> {
             Long authorId = item.getAuthorId();
             SysUser user = userService.getById(authorId);
-            item.setAuthorAccount(user.getAccount());
-            item.setAuthorCover(user.getAvatar());
-            item.setAuthorNickname(user.getNickname());
+            if (!Objects.isNull(user)){
+                item.setAuthorAccount(user.getAccount());
+                item.setAuthorCover(user.getAvatar());
+                item.setAuthorNickname(user.getNickname());
+            }
         });
         long total = resPage.getTotal();
         long pages = resPage.getPages();
@@ -112,6 +115,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
         if (StrUtil.isNotBlank(updateVo.getCover())) {
             article.setCover(updateVo.getCover());
         }
+        if (StrUtil.isNotBlank(updateVo.getSummary())) {
+            article.setSummary(updateVo.getSummary());
+        }
         //更新文章
         this.updateById(article);
         //更新主体
@@ -148,7 +154,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
         Article article = new Article();
         article.setCommentCounts(0);
         article.setGmtCreate(new Date());
-        article.setSummary("文章简介");
+        article.setSummary(publishVo.getSummary());
         article.setTitle(publishVo.getTitle());
         article.setViewCounts(0);
         article.setWeight(0);

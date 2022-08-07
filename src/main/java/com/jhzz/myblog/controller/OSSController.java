@@ -2,6 +2,7 @@ package com.jhzz.myblog.controller;
 
 import com.jhzz.myblog.common.ResponseResult;
 import com.jhzz.myblog.service.OssService;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @Slf4j
+@Api
 @RequestMapping("oss")
 public class OSSController {
     @Resource

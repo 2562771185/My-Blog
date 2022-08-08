@@ -11,6 +11,7 @@ import com.jhzz.myblog.domain.vo.ArticlePublishVo;
 import com.jhzz.myblog.domain.vo.ArticleUpdateVo;
 import com.jhzz.myblog.domain.vo.ArticleVo;
 import com.jhzz.myblog.service.ArticleService;
+import com.jhzz.myblog.service.LoginService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +50,8 @@ public class ArticleController {
     @ApiOperation("根据id编辑文章")
     @GetMapping("/edit")
     @LogAnnotation(module = "文章", operation = "根据id编辑文章")
-    public ResponseResult editArticle(@RequestParam("id") Long id) {
-        return articleService.editArticle(id);
+    public ResponseResult editArticle(@RequestParam("id") Long id,@RequestHeader("Authorization") String token) {
+        return articleService.editArticle(id,token);
     }
 
     @ApiOperation("更新文章")

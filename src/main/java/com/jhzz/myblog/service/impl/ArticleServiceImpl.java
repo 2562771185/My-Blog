@@ -22,6 +22,7 @@ import com.jhzz.myblog.exception.BlogException;
 import com.jhzz.myblog.service.ArticleBodyService;
 import com.jhzz.myblog.service.ArticleService;
 import com.jhzz.myblog.mapper.ArticleMapper;
+import com.jhzz.myblog.service.LoginService;
 import com.jhzz.myblog.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     private SysUserService userService;
     @Autowired
     private ArticleBodyService articleBodyService;
-
+    @Autowired
+    private LoginService loginService;
     @Override
     public ResponseResult queryArticlePage(QueryParam queryParam) {
         Page<Article> articlePage = new Page<>(queryParam.getPage(), Constant.DEFAULT_PAGE_SIZE);
@@ -92,7 +94,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     }
 
     @Override
-    public ResponseResult editArticle(Long id) {
+    public ResponseResult editArticle(Long id,String token) {
+        /**
+         * 检查token是否合法
+         */
+        ResponseResult result = loginService.checkToken(token);
+        HashMap<String,Object> map = (HashMap<String, Object>) result.getData();
+        Long tokenUserId = (Long) map.get("id");
+
         //1.查询文章主体
         ArticleBody body = articleBodyService.getOne(new LambdaQueryWrapper<ArticleBody>().eq(ArticleBody::getArticleId, id));
 
@@ -102,6 +111,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
             return ResponseResult.errorResult(500,"文章不存在");
         }
         SysUser author = userService.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getId, article.getAuthorId()));
+        if (!tokenUserId.equals(author.getId())){
+            return ResponseResult.errorResult(AppHttpCodeEnum.NO_OPERATOR_AUTH,AppHttpCodeEnum.NO_OPERATOR_AUTH.getMsg());
+        }
         ArticleEditVo vo = new ArticleEditVo();
         vo.setArticleBody(body);
         vo.setTitle(article.getTitle());

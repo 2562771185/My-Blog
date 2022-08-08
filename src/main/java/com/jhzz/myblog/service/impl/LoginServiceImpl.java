@@ -113,6 +113,7 @@ public class LoginServiceImpl implements LoginService {
             map.put("id", user.getId());
             map.put("nickname", user.getNickname());
             map.put("avatar", user.getAvatar());
+            map.put("bannerImg", user.getBannerImg());
             return ResponseResult.okResult(map);
         } catch (Exception e) {
             log.error("解析token出错！");

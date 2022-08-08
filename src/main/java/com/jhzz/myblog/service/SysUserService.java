@@ -5,6 +5,7 @@ import com.jhzz.myblog.domain.SysUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jhzz.myblog.domain.param.LoginParam;
 import com.jhzz.myblog.domain.param.RegisterParam;
+import com.jhzz.myblog.domain.param.UserUpdateVo;
 import com.jhzz.myblog.domain.param.VerifyParam;
 
 /**
@@ -20,4 +21,6 @@ public interface SysUserService extends IService<SysUser> {
 
 
     ResponseResult verification(VerifyParam data);
+
+    ResponseResult updateInfo(UserUpdateVo vo);
 }

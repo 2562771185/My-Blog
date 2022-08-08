@@ -3,7 +3,9 @@ package com.jhzz.myblog.service.impl;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhzz.myblog.common.AppHttpCodeEnum;
 import com.jhzz.myblog.common.Constant;
@@ -11,6 +13,7 @@ import com.jhzz.myblog.common.ResponseResult;
 import com.jhzz.myblog.domain.SysUser;
 import com.jhzz.myblog.domain.param.LoginParam;
 import com.jhzz.myblog.domain.param.RegisterParam;
+import com.jhzz.myblog.domain.param.UserUpdateVo;
 import com.jhzz.myblog.domain.param.VerifyParam;
 import com.jhzz.myblog.exception.BlogException;
 import com.jhzz.myblog.service.SysUserService;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Huanzhi
@@ -82,7 +86,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             user.setEmail(register.getEmail());
         }
         user.setLastLogin(new DateTime().getTime());
-        user.setMobilePhoneNumber("");
+        user.setBannerImg("");
         if (StrUtil.isNotBlank(register.getNickname())) {
             user.setNickname(register.getNickname());
         }
@@ -102,21 +106,45 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     public ResponseResult verification(VerifyParam data) {
         String type = data.getType();
         String account = data.getAccount();
-        log.info("account:{}",account);
-        log.info("type:{}",type);
+        log.info("account:{}", account);
+        log.info("type:{}", type);
         if (!StrUtil.isAllNotBlank(type, account)) {
             return ResponseResult.errorResult(500, "用户名为空!");
         }
         SysUser user = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getAccount, account));
-        log.info("user:{}",user);
-        if (user == null){
+        log.info("user:{}", user);
+        if (user == null) {
             return ResponseResult.errorResult(500, "用户名不存在！");
         }
         String email = user.getEmail();
         HashMap<String, Object> map = new HashMap<>(2);
-        map.put("email",email);
-        map.put("status","ok");
+        map.put("email", email);
+        map.put("status", "ok");
         return ResponseResult.okResult(map);
+    }
+
+    @Override
+    public ResponseResult updateInfo(UserUpdateVo vo) {
+        LambdaUpdateWrapper<SysUser> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(SysUser::getAccount, vo.getAccount());
+        if (StrUtil.isNotBlank(vo.getNickname())) {
+            wrapper.set(SysUser::getNickname, vo.getNickname());
+        }
+        if (StrUtil.isNotBlank(vo.getAvatar())) {
+            wrapper.set(SysUser::getAvatar, vo.getAvatar());
+        }
+        if (StrUtil.isNotBlank(vo.getBannerImg())) {
+            wrapper.set(SysUser::getBannerImg, vo.getBannerImg());
+        }
+
+        boolean b = this.update(wrapper);
+        if (b){
+            //更新redis
+            SysUser user = this.getAuthorInfoByAccount(vo.getAccount());
+            redisCache.setCacheObject(Constant.LOGIN_USER + user.getAccount(), JSON.toJSONString(user), 2, TimeUnit.HOURS);
+            return ResponseResult.okResult(200,"更新资料成功！");
+        }
+        return ResponseResult.errorResult();
     }
 
 

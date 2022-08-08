@@ -43,9 +43,9 @@ public class UserVo implements Serializable {
 
 
     /**
-     * 手机号
+     * 背景图
      */
-    private String mobilePhoneNumber;
+    private String bannerImg;
 
     /**
      * 昵称

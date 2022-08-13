@@ -26,7 +26,7 @@ import java.util.UUID;
 @Service
 public class OssServiceImpl implements OssService {
     @Override
-    public String uploadFile(MultipartFile file) {
+    public String uploadFile(MultipartFile file, String host) {
         String endpoint = ConstantPropertiesUtil.END_POINT;
         String accessKeyId = ConstantPropertiesUtil.ACCESS_KEY_ID;
         String accessKeySecret = ConstantPropertiesUtil.ACCESS_KEY_SECRET;
@@ -35,14 +35,14 @@ public class OssServiceImpl implements OssService {
 
         String uploadUrl = null;
         //构建日期路径：avatar/2019/02/26/文件名
-        String filePath = new DateTime().toString("yyyy/MM/dd");
+        String filePath = new DateTime().toString("yyyy/MM");
 
         //文件名：uuid.扩展名
         String original = file.getOriginalFilename();
         String fileName = UUID.randomUUID().toString();
         String fileType = original.substring(original.lastIndexOf("."));
         String newName = fileName + fileType;
-        String fileUrl = fileHost+"/"   + filePath + "/" + newName;
+        String fileUrl = fileHost + host + "/" + filePath + "/" + newName;
 
 
         // 创建OSSClient实例。

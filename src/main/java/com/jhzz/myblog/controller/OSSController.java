@@ -33,20 +33,21 @@ public class OSSController {
 
     @PostMapping("/upload")
     @LogAnnotation(module = "OSS", operation = "上传图片")
-    public ResponseResult uploadFile(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String token) {
+    public ResponseResult uploadFile(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String token,
+             @RequestParam("host") String host) {
         ResponseResult result = loginService.checkToken(token);
         if (!result.getCode().equals(200)) {
             return ResponseResult.errorResult(AppHttpCodeEnum.NO_OPERATOR_AUTH, AppHttpCodeEnum.NO_OPERATOR_AUTH.getMsg());
         }
         log.info("file:{}", file.getOriginalFilename());
-        String url = ossService.uploadFile(file);
+        String url = ossService.uploadFile(file,host);
         return ResponseResult.okResult(url);
     }
 
     @PostMapping("/uploadlist")
-    public ResponseResult uploadFileList(@RequestParam("file") MultipartFile file) {
+    public ResponseResult uploadFileList(@RequestParam("file") MultipartFile file, @RequestParam("host") String host) {
         log.info("file:{}", file.getOriginalFilename());
-        String url = ossService.uploadFile(file);
+        String url = ossService.uploadFile(file,host);
         return ResponseResult.okResult(url);
     }
 

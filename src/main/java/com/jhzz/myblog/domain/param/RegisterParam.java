@@ -3,6 +3,8 @@ package com.jhzz.myblog.domain.param;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * \* Created with IntelliJ IDEA.
  * \* @author: Huanzhi
@@ -13,9 +15,11 @@ import lombok.Data;
  */
 @Data
 public class RegisterParam {
-
+    @NotBlank(message = "用户名不能为空")
     private String account;
+    @NotBlank(message = "昵称不能为空")
     private String nickname;
+    @NotBlank(message = "密码不能为空")
     private String password;
     private String email;
     /**
@@ -26,7 +30,4 @@ public class RegisterParam {
      * 验证码对应id
      */
     private String uuid;
-    public boolean checkAllParams(){
-        return StrUtil.isAllNotBlank(account,nickname,password,email);
-    }
 }

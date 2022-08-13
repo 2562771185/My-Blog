@@ -64,10 +64,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         }
 
         // 检查注册参数
-        boolean checkAllParams = register.checkAllParams();
-        if (!checkAllParams) {
-            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_ERROR, AppHttpCodeEnum.PARAM_ERROR.getMsg());
-        }
+//        if (!register.checkAllParams()) {
+//            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_ERROR, AppHttpCodeEnum.PARAM_ERROR.getMsg());
+//        }
         //用户名不能重复
         String account = register.getAccount();
         if (StrUtil.isNotBlank(account)) {
@@ -141,7 +140,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         if (b){
             //更新redis
             SysUser user = this.getAuthorInfoByAccount(vo.getAccount());
-            redisCache.setCacheObject(Constant.LOGIN_USER + user.getAccount(), JSON.toJSONString(user), 2, TimeUnit.HOURS);
+            //删除之前的旧数据
+            redisCache.deleteObject(Constant.LOGIN_USER + user.getAccount());
+            //把完整的用户信息存入redis  userid作为key
+            redisCache.setCacheObject(Constant.LOGIN_USER + user.getAccount(), JSON.toJSONString(user), 1, TimeUnit.HOURS);
+            log.info("更新redis中的数据成功！");
             return ResponseResult.okResult(200,"更新资料成功！");
         }
         return ResponseResult.errorResult();

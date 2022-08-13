@@ -3,6 +3,7 @@ package com.jhzz.myblog.domain.param;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -15,22 +16,19 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 public class LoginParam {
-    @NotNull
+    @NotBlank(message = "用户名不能为空")
     private String account;
-    @NotNull
+    @NotBlank(message = "密码不能为空")
     private String password;
     /**
      * 验证码
      */
-    @NotNull
+    @NotBlank(message = "验证码不能为空")
     private String captchaKey;
     /**
      * 验证码对应id
      */
-    @NotNull
+    @NotBlank(message = "验证码id不能为空")
     private String uuid;
 
-    public boolean checkAllParams(){
-        return StrUtil.isAllNotBlank(account,password,captchaKey,uuid);
-    }
 }

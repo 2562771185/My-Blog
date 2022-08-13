@@ -80,7 +80,7 @@ public class LoginServiceImpl implements LoginService {
         Map<String, Object> map = new HashMap<>(1);
         map.put("token", jwt);
         //把完整的用户信息存入redis  userid作为key
-        redisCache.setCacheObject(Constant.LOGIN_USER + account, JSON.toJSONString(user), 2, TimeUnit.HOURS);
+        redisCache.setCacheObject(Constant.LOGIN_USER + account, JSON.toJSONString(user), 1, TimeUnit.HOURS);
         return ResponseResult.okResult(200, "登录成功", map);
     }
 

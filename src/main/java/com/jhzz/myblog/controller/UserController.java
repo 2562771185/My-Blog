@@ -15,6 +15,7 @@ import com.jhzz.myblog.service.SysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -45,15 +46,14 @@ public class UserController {
     @PostMapping("/register")
     @ApiOperation("注册新用户")
     @LogAnnotation(module = "用户", operation = "注册")
-    public ResponseResult register(@RequestBody RegisterParam register) {
+    public ResponseResult register(@RequestBody @Validated RegisterParam register) {
         return userService.register(register);
-
     }
 
     @PostMapping("/login")
     @ApiOperation("登录")
     @LogAnnotation(module = "用户", operation = "登录")
-    public ResponseResult login(@RequestBody LoginParam loginParam) {
+    public ResponseResult login(@RequestBody @Validated LoginParam loginParam) {
         return loginService.login(loginParam);
     }
 

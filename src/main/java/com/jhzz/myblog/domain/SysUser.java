@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * 
  * @author Huanzhi
@@ -28,6 +30,7 @@ public class SysUser implements Serializable {
     /**
      * 账号
      */
+    @NotBlank(message = "用户名不能为空")
     private String account;
 
     /**
@@ -68,11 +71,13 @@ public class SysUser implements Serializable {
     /**
      * 昵称
      */
+    @NotBlank(message = "昵称不能为空")
     private String nickname;
 
     /**
      * 密码
      */
+    @NotBlank(message = "密码不能为空")
     private String password;
 
     /**
